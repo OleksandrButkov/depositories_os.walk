@@ -14,6 +14,12 @@ extensions = {
 
 main_path = r'C:\best_folder\папка'
 
+#якщо папки не існує, то функція створює її
+def create_folders_from_list(folder_path, folder_names):
+    for folder in folder_names:
+        if not os.path.exists(f'{folder_path}\\{folder}'):
+            os.mkdir(f'{folder_path}\\{folder}')
+
 """
 функція сортування проходить за допомогою методу os.walk проходить через всі файли, отримуючи їх розширення, поділяючи їх на ім'я і розширення
 потім, отримуючи данні значень словника ми порівнюємо розширення файлу та значення ключа, і за допомогою методу os.rename переносимо файл в 
@@ -37,12 +43,6 @@ def sort_path(folder_path):
                     print(f'Moving {file_name} in {ext_list[dict_key_int][0]} folder\n')
                     os.rename(file_path, f'{main_path}\\{ext_list[dict_key_int][0]}\\{file_name}')#переносимо файл в папку, назва якої відповідає ключу словника
 
-
-#якщо папки не існує, то функція створює її
-def create_folders_from_list(folder_path, folder_names):
-    for folder in folder_names:
-        if not os.path.exists(f'{folder_path}\\{folder}'):
-            os.mkdir(f'{folder_path}\\{folder}')
 
 """
 фунція normilze оптимізує назви файлів. приймає на вхід рядок з назви файлу та повертає відформатований рядок,

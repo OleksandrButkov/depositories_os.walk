@@ -29,22 +29,29 @@ def create_folders_from_list(folder_path, folder_names):
 def sort_path(folder_path):
     ext_list = list(extensions.items())
     for root, dirs, files in os.walk(folder_path):
-        file_paths = [os.path.join(root, n) for n in files] #отримуємо повний шлях до кожного файлу.
+        if any(dir_name in root for dir_name in ['archives','images','documents','audio', 'video', 'non type extension']):      #ігнорування папки 'archives' при проходженні
+            continue
+        file_paths = [os.path.join(root, n) for n in files]         #отримуємо повний шлях до кожного файлу.
 
 
         for file_path in file_paths:
-            extension = file_path.split('.')[-1]            #розширення окремо
-            file_name = file_path.split('\\')[-1]           #назва файлу окремо
+            extension = file_path.split('.')[-1]                    #розширення окремо
+            file_name = file_path.split('\\')[-1]                   #назва файлу окремо
+            new_name = ".".join([normalize(file_name.split(".")[0]), extension])
             # додано для відладки
             print(f"File path: {file_path}, extension: {extension}")
 
+
             for dict_key_int in range(len(ext_list)):
                 # за індексом визначаємо, що первіряємо розширення файлу і аргументи словника
+
                 if extension in list(ext_list[dict_key_int][1]):
                     print(f'Moving {file_name} in {ext_list[dict_key_int][0]} folder\n')
+                    print(extension)
                     # переносимо файл в папку, назва якої відповідає ключу словника
-                    shutil.move(file_path, f'{main_path}\\{ext_list[dict_key_int][0]}\\{file_name}')
-
+                    shutil.move(file_path, f'{main_path}\\{ext_list[dict_key_int][0]}\\{new_name}')
+                # if extension not in list(ext_list[dict_key_int][1]):
+                #     shutil.move(file_path, f'{main_path}\\non type extension\\{file_name}')
 
 """
 фунція normilze оптимізує назви файлів. приймає на вхід рядок з назви файлу та повертає відформатований рядок,
@@ -70,16 +77,6 @@ def normalize(text):
     text = re.sub(r'[^a-zA-Z0-9]+', '_', text)
     return text
 
-#Перейменовує файли та папки в заданій папці з використанням функції normalize.
-def rename_files(folder_path):
-    for root, dirs, files in os.walk(folder_path):
-        for file_name in files:
-            old_file_path = os.path.join(root, file_name)              # повний шлях до файлу
-            file_name_no_ext, extension = os.path.splitext(file_name)  # розділення за іменем файлу
-            new_file_name = normalize(file_name_no_ext) + extension    # перейменування без зміни розширення
-            new_file_path = os.path.join(root, new_file_name)          # створення шляху для переіменованої папки
-            os.rename(old_file_path, new_file_path)                    # переіменування файлу в папці
-
 
 def deleted_empty_dirs(folder_path, folder_names):
     empty_folders_in_this_run = 0                                       # лічильник кількості пустих директорій
@@ -94,8 +91,8 @@ def deleted_empty_dirs(folder_path, folder_names):
             deleted_empty_dirs(folder_path, folder_names)               # викликає функцію ще раз для перевірки директорії
 
 
+
 if __name__ == "__main__":
     create_folders_from_list(main_path, extensions)
     sort_path(main_path)
     deleted_empty_dirs(main_path, extensions)
-    rename_files(main_path)

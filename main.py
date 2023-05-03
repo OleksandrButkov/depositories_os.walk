@@ -12,7 +12,7 @@ extensions = {
     'non type extension': []
 }
 
-main_path = r'path\to\folder'  #тут зазначаємо шлях та назву папки, яку будемо сортувати
+main_path = r'C:\best_folder\папка'  #тут зазначаємо шлях та назву папки, яку будемо сортувати
 
 #якщо папки не існує, то функція створює її
 def create_folders_from_list(folder_path, folder_names):
@@ -90,8 +90,8 @@ def deleted_empty_dirs(folder_path, folder_names):
             if (not dirs) and (not files):
                 empty_folders_in_this_run += 1                          # якщо знаходимо непусту директорію, то +1
                 os.rmdir(path)                                          # вона видаляється
-    if empty_folders_in_this_run > 0:                                   # перевіряємо, чи є ще пуста директорія там
-        deleted_empty_dirs(folder_path, folder_names)                   # викликає функцію ще раз для перевірки директорії
+        if empty_folders_in_this_run > 0:                               # перевіряємо, чи є ще пуста директорія там
+            deleted_empty_dirs(folder_path, folder_names)               # викликає функцію ще раз для перевірки директорії
 
 
 if __name__ == "__main__":

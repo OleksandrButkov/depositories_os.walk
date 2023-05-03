@@ -1,6 +1,6 @@
 import os
 import re
-# import shutil
+import shutil
 
 #ключі папок є назвами папок, які створює функція create_folders_from_list
 extensions = {
@@ -12,36 +12,38 @@ extensions = {
     'non type extension': []
 }
 
-main_path = r'C:\best_folder\папка'
+main_path = r'path_to_folder'  #тут зазначаємо шлях та назву папки, яку будемо сортувати
 
 #якщо папки не існує, то функція створює її
 def create_folders_from_list(folder_path, folder_names):
     for folder in folder_names:
-        if not os.path.exists(f'{folder_path}\\{folder}'):
+        if not os.path.exists(f'{folder_path}\\{folder}'):  # назви папок перевіряємо по ключах словника
             os.mkdir(f'{folder_path}\\{folder}')
 
 """
 функція сортування проходить за допомогою методу os.walk проходить через всі файли, отримуючи їх розширення, поділяючи їх на ім'я і розширення
-потім, отримуючи данні значень словника ми порівнюємо розширення файлу та значення ключа, і за допомогою методу os.rename переносимо файл в 
+потім, отримуючи данні значень словника ми порівнюємо розширення файлу та значення ключа, і за допомогою методу os.rename переносимо файл в
 папку, назва якого = ключу відповідного розширення
 """
 
 def sort_path(folder_path):
     ext_list = list(extensions.items())
     for root, dirs, files in os.walk(folder_path):
-        file_paths = [os.path.join(root,n) for n in files] #створюємо повний шлях до кожного файлу.
+        file_paths = [os.path.join(root, n) for n in files] #отримуємо повний шлях до кожного файлу.
 
 
         for file_path in file_paths:
-            extension = file_path.split('.')[-1] #розширення окремо
-            file_name = file_path.split('\\')[-1] #назва файлу окремо
+            extension = file_path.split('.')[-1]            #розширення окремо
+            file_name = file_path.split('\\')[-1]           #назва файлу окремо
             # додано для відладки
             print(f"File path: {file_path}, extension: {extension}")
 
             for dict_key_int in range(len(ext_list)):
-                if extension in list(ext_list[dict_key_int][1]):#за індексом визначаємо, що первіряємо розширення файлу і аргументи словника
+                # за індексом визначаємо, що первіряємо розширення файлу і аргументи словника
+                if extension in list(ext_list[dict_key_int][1]):
                     print(f'Moving {file_name} in {ext_list[dict_key_int][0]} folder\n')
-                    os.rename(file_path, f'{main_path}\\{ext_list[dict_key_int][0]}\\{file_name}')#переносимо файл в папку, назва якої відповідає ключу словника
+                    # переносимо файл в папку, назва якої відповідає ключу словника
+                    os.rename(file_path, f'{main_path}\\{ext_list[dict_key_int][0]}\\{file_name}')
 
 
 """
@@ -68,21 +70,26 @@ def normalize(text):
     text = re.sub(r'[^a-zA-Z0-9]+', '_', text)
     return text
 
-# #Перейменовує файли та папки в заданій папці з використанням функції normalize.
-# def rename_files(folder_path):
-#
-#     # отримуємо назви файлів та папок
-#     file_names = [i.name for i in os.scandir(folder_path) if i.is_file()]
-#
-#     #переіменовуємо файли використовуючи функцію normalize
-#     for file_name in file_names:
-#         file_path = os.path.join(folder_path, file_name)
-#         file_ext = os.path.splitext(file_name)[1]  # отримуємо розширення файлу
-#         new_file_name = normalize(os.path.splitext(file_name)[0]) + file_ext #до нової назви додаємо розширення
-#         os.rename(file_path, os.path.join(folder_path, new_file_name))
+#Перейменовує файли та папки в заданій папці з використанням функції normalize.
+def rename_files(folder_path):
+    for root, dirs, files in os.walk(folder_path):
+        for file_name in files:
+            old_file_path = os.path.join(root, file_name)              # повний шлях до файлу
+            file_name_no_ext, extension = os.path.splitext(file_name)  # розділення за іменем файлу
+            new_file_name = normalize(file_name_no_ext) + extension    # перейменування без зміни розширення
+            new_file_path = os.path.join(root, new_file_name)          # створення шляху для переіменованої папки
+
+            os.rename(old_file_path, new_file_path)                    # переіменування файлу в папці
+
+
+def deleted_empty_dirs(folder_path):
+    for path, dirs, files in os.walk(folder_path):
+        if (not dirs) and (not files):                                 # якщо в папці немає файлу та інших папок,
+            os.rmdir(path)                                             # то вона видаляється
+
 
 if __name__ == "__main__":
-    # rename_files(main_path)
     create_folders_from_list(main_path, extensions)
     sort_path(main_path)
-
+    deleted_empty_dirs(main_path)
+    rename_files(main_path)

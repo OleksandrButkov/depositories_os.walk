@@ -43,7 +43,7 @@ def sort_path(folder_path):
                 if extension in list(ext_list[dict_key_int][1]):
                     print(f'Moving {file_name} in {ext_list[dict_key_int][0]} folder\n')
                     # переносимо файл в папку, назва якої відповідає ключу словника
-                    os.rename(file_path, f'{main_path}\\{ext_list[dict_key_int][0]}\\{file_name}')
+                    shutil.move(file_path, f'{main_path}\\{ext_list[dict_key_int][0]}\\{file_name}')
 
 
 """
@@ -78,21 +78,24 @@ def rename_files(folder_path):
             file_name_no_ext, extension = os.path.splitext(file_name)  # розділення за іменем файлу
             new_file_name = normalize(file_name_no_ext) + extension    # перейменування без зміни розширення
             new_file_path = os.path.join(root, new_file_name)          # створення шляху для переіменованої папки
-
             os.rename(old_file_path, new_file_path)                    # переіменування файлу в папці
 
 
-def deleted_empty_dirs(folder_path):
-    empty_folders_in_this_run = 0                                      # лічильник кількості пустих директорій
+def deleted_empty_dirs(folder_path, folder_names):
+    empty_folders_in_this_run = 0                                       # лічильник кількості пустих директорій
     for path, dirs, files in os.walk(folder_path):
-        if (not dirs) and (not files):                                 # якщо в папці немає файлу та інших папок,
-            empty_folders_in_this_run += 1                             # якщо знаходимо непусту директорію, то +1
-            os.rmdir(path)                                             # вона видаляється
-    if empty_folders_in_this_run > 0:                                  # перевіряємо, чи є ще пуста директорія там
-        deleted_empty_dirs(folder_path)                                # викликає функцію ще раз для перевірки директорії
+        for folder in folder_names:                                     # якщо назва папки зі словника, то вона ігнорується та не видаляється
+            if os.path.exists(f'{folder_path}\\{folder}'):
+                continue
+            if (not dirs) and (not files):
+                empty_folders_in_this_run += 1                          # якщо знаходимо непусту директорію, то +1
+                os.rmdir(path)                                          # вона видаляється
+    if empty_folders_in_this_run > 0:                                   # перевіряємо, чи є ще пуста директорія там
+        deleted_empty_dirs(folder_path, folder_names)                   # викликає функцію ще раз для перевірки директорії
+
 
 if __name__ == "__main__":
     create_folders_from_list(main_path, extensions)
-#    deleted_empty_dirs(main_path)
     sort_path(main_path)
+    deleted_empty_dirs(main_path, extensions)
     rename_files(main_path)

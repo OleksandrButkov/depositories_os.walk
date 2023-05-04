@@ -44,14 +44,16 @@ def sort_path(folder_path):
 
             for dict_key_int in range(len(ext_list)):
                 # за індексом визначаємо, що первіряємо розширення файлу і аргументи словника
+                if extension in extensions['archives']:
+                    print(f'це {os.path.splitext(file_path)} шлях до архіву без назви файлу')
 
                 if extension in list(ext_list[dict_key_int][1]):
                     print(f'Moving {file_name} in {ext_list[dict_key_int][0]} folder\n')
                     print(extension)
                     # переносимо файл в папку, назва якої відповідає ключу словника
                     shutil.move(file_path, f'{main_path}\\{ext_list[dict_key_int][0]}\\{new_name}')
-                # if extension not in list(ext_list[dict_key_int][1]):
-                #     shutil.move(file_path, f'{main_path}\\non type extension\\{file_name}')
+                if extension not in list(ext_list[dict_key_int][1]):
+                    print(extension)
 
 """
 фунція normilze оптимізує назви файлів. приймає на вхід рядок з назви файлу та повертає відформатований рядок,
@@ -81,14 +83,13 @@ def normalize(text):
 def deleted_empty_dirs(folder_path, folder_names):
     empty_folders_in_this_run = 0                                       # лічильник кількості пустих директорій
     for path, dirs, files in os.walk(folder_path):
-        for folder in folder_names:                                     # якщо назва папки зі словника, то вона ігнорується та не видаляється
-            if os.path.exists(f'{folder_path}\\{folder}'):
-                continue
-            if (not dirs) and (not files):
-                empty_folders_in_this_run += 1                          # якщо знаходимо непусту директорію, то +1
-                os.rmdir(path)                                          # вона видаляється
-        if empty_folders_in_this_run > 0:                               # перевіряємо, чи є ще пуста директорія там
-            deleted_empty_dirs(folder_path, folder_names)               # викликає функцію ще раз для перевірки директорії
+        if any(dir_name in path for dir_name in ['archives','images','documents','audio', 'video', 'non type extension']):      #ігнорування папки 'archives' при проходженні
+            continue
+        if (not dirs) and (not files):
+            empty_folders_in_this_run += 1                          # якщо знаходимо непусту директорію, то +1
+            os.rmdir(path)                                          # вона видаляється
+    if empty_folders_in_this_run > 0:                               # перевіряємо, чи є ще пуста директорія там
+        deleted_empty_dirs(folder_path, folder_names)               # викликає функцію ще раз для перевірки директорії
 
 
 

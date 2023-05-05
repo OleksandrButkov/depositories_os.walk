@@ -46,8 +46,8 @@ def sort_path(folder_path):
                 # за індексом визначаємо, що первіряємо розширення файлу і аргументи словника
                 if extension in extensions['archives']:
                     print(f'це {os.path.splitext(file_path)} шлях до архіву без назви файлу')
-
-                if extension in list(ext_list[dict_key_int][1]):
+                    shutil.unpack_archive(file_path, f'{main_path}\\archives\\{os.path.splitext(new_name)[0]}')
+                if extension in list(ext_list[dict_key_int][1]) and extension not in extensions['archives']:
                     print(f'Moving {file_name} in {ext_list[dict_key_int][0]} folder\n')
                     print(extension)
                     # переносимо файл в папку, назва якої відповідає ключу словника

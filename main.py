@@ -1,3 +1,4 @@
+import sys
 import os
 import re
 import shutil
@@ -12,7 +13,7 @@ extensions = {
     'non type extension': []
 }
 
-main_path = r'C:\best_folder\папка'  #тут зазначаємо шлях та назву папки, яку будемо сортувати
+main_path = sys.argv[1]  #тут зазначаємо шлях та назву папки, яку будемо сортувати
 
 #якщо папки не існує, то функція створює її
 def create_folders_from_list(folder_path, folder_names):
@@ -94,6 +95,7 @@ def deleted_empty_dirs(folder_path, folder_names):
 
 
 if __name__ == "__main__":
-    create_folders_from_list(main_path, extensions)
-    sort_path(main_path)
-    deleted_empty_dirs(main_path, extensions)
+    def main():
+        create_folders_from_list(main_path, extensions)
+        sort_path(main_path)
+        deleted_empty_dirs(main_path, extensions)
